@@ -1,0 +1,87 @@
+SIZE = 10
+LETTERS = ["A","B","C","D","E","F","G","H","I","J"]
+
+
+# turn user input like B7 into row and column numbers
+def parse_coord(text):
+    text = text.strip().upper()
+
+    if len(text) < 2:
+        return None
+
+    row_letter = text[0]
+    if row_letter not in LETTERS:
+        return None
+
+    try:
+        col_num = int(text[1:])
+    except:
+        return None
+
+    if col_num < 1 or col_num > SIZE:
+        return None
+
+    row = LETTERS.index(row_letter)
+    col = col_num - 1
+    return (row, col)
+
+
+# ask the user for a shot until they give a valid coordinate
+def get_shot():
+    while True:
+        move = input("Enter shot (example B7): ")
+        pos = parse_coord(move)
+
+        if pos is not None:
+            return pos
+
+        print("Invalid coordinate. Try again.")
+
+
+# ask the user to place a ship and return the coordinates
+def get_ship(length):
+    while True:
+        raw = input("Place ship length " + str(length) + " (example A1 A5): ")
+        parts = raw.split()
+
+        if len(parts) != 2:
+            print("Type two coordinates.")
+            continue
+
+        start = parse_coord(parts[0])
+        end = parse_coord(parts[1])
+
+        if start is None or end is None:
+            print("Invalid coordinates.")
+            continue
+
+        r1, c1 = start
+        r2, c2 = end
+
+        coords = []
+
+        # horizontal ship
+        if r1 == r2:
+            step = 1 if c2 >= c1 else -1
+            c = c1
+            while c != c2 + step:
+                coords.append((r1, c))
+                c += step
+
+        # vertical ship
+        elif c1 == c2:
+            step = 1 if r2 >= r1 else -1
+            r = r1
+            while r != r2 + step:
+                coords.append((r, c1))
+                r += step
+
+        else:
+            print("Ship must be straight.")
+            continue
+
+        if len(coords) != length:
+            print("Ship must be length", length)
+            continue
+
+        return coords
